@@ -332,19 +332,20 @@ def user_profile():
 
 # Route for Account Tracking
 @app.route('/budgetTracker/savings', methods=['POST'])
-def account_tracking():
-    query = text("SELECT balance FROM savings_acount WHERE accountid = :accountid")
-    savingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
-    return render_template("account_tracking.html", data= savingsAccount_data)
-    
+def savings():
+    with engine.connect() as conn:
+      query = text("SELECT balance FROM savings_acount WHERE accountid = :accountid")
+      savingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
+      return render_template("account_tracking.html", data= savingsAccount_data)
+      
 @app.route('/budgetTracker/checkings', methods=['POST'])
-def account_tracking():
+def checkings():
     query = text("SELECT balance FROM checkings_account WHERE accountid = :accountid")
     checkingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
     return render_template("account_tracking.html", data= checkingsAccount_data)
 
 @app.route('/budgetTracker/meal_plan', methods=['POST'])
-def account_tracking():
+def mealPlan():
     query = text("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = :accountid")
     mealPlan_data = engine.execute(query, swipes=request.args.get('swipes'), 
                                    dining_dollars=request.args.get('dining_dollars'), 
