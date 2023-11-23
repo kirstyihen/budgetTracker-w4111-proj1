@@ -312,8 +312,7 @@ def teardown_request(exception):
 #
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
-#
-
+#  
 #Route for budgetTracker
 @app.route('/budgetTracker')
 def budgetTracker():
