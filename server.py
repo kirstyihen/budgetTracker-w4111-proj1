@@ -314,20 +314,21 @@ def teardown_request(exception):
 # The functions for each app.route need to have different names
 #  
 #Route for budgetTracker
-@app.route('/budgetTracker')
+@app.route('/budgetTracker', methods=['GET'])
 def budgetTracker():
-    query = text("SELECT * FROM transactionhis WHERE accountid = :accountid")
-    accountid_data = engine.execute(query, accountid=request.args.get('accountid')).fetchall()
-    print(request.args)
-    return render_template("budgetTracker.html")
-  
+    query = text("SELECT * FROM user_attends WHERE uni = :uni AND password = :password")
+    login_data = engine.execute(query, uni=request.args.get('uni'), password = request.args.get('password')).fetchall()
+    if login_data:
+        return redirect("/budgetTracker/user_profile?uni=" + request.args.get('uni'))
+    else:
+        return "Invalid username or password"
+
 # Route for User Profile
 @app.route('/budgetTracker/user_profile')
 def user_profile():
     query = text("SELECT * FROM user_attends WHERE uni = :uni")
     user_profile_data = engine.execute(query, uni=request.args.get('uni')).fetchall()
     return render_template("user_profile.html", data = user_profile_data)
-
 
 # Route for Account Tracking
 @app.route('/budgetTracker/account_tracking')
