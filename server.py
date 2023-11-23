@@ -330,6 +330,11 @@ def user_profile():
     user_profile_data = engine.execute(query, uni=request.args.get('uni')).fetchall()
     return render_template("user_profile.html", data = user_profile_data)
 
+@app.route('/budgetTracker/SignUp', methods= ['PUT'])
+def signUp():
+   query = text("INSERT INTO user_attends(uni, name, username, password, schoolcode) VALUES (:uni, :name, :username, :password, :schoolcode)")  
+   engine.execute(query, uni=request.args.get('uni'), name=request.args.get('name'), username=request.args.get('username'), password=request.args.get('password'), schoolcode=request.args.get('schoolcode'))
+   
 # Route for Account Tracking
 @app.route('/budgetTracker/savings', methods=['POST'])
 def savings():
