@@ -324,19 +324,32 @@ def budgetTracker():
         return "Invalid username or password"
 
 # Route for User Profile
-@app.route('/budgetTracker/user_profile')
+@app.route('/budgetTracker/user_profile', methods=['POST'])
 def user_profile():
     query = text("SELECT * FROM user_attends WHERE uni = :uni")
     user_profile_data = engine.execute(query, uni=request.args.get('uni')).fetchall()
     return render_template("user_profile.html", data = user_profile_data)
 
 # Route for Account Tracking
-@app.route('/budgetTracker/account_tracking')
+@app.route('/budgetTracker/savings', methods=['POST'])
 def account_tracking():
-    query = text("SELECT * FROM account_belongsto WHERE uni = :uni")
-    account_data = engine.execute(query, uni=request.args.get('uni')).fetchall()
-    return render_template("account_tracking.html", data= account_data)
+    query = text("SELECT balance FROM savings_acount WHERE accountid = :accountid")
+    savingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
+    return render_template("account_tracking.html", data= savingsAccount_data)
     
+@app.route('/budgetTracker/checkings', methods=['POST'])
+def account_tracking():
+    query = text("SELECT balance FROM checkings_account WHERE accountid = :accountid")
+    checkingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
+    return render_template("account_tracking.html", data= checkingsAccount_data)
+
+@app.route('/budgetTracker/meal_plan', methods=['POST'])
+def account_tracking():
+    query = text("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = :accountid")
+    mealPlan_data = engine.execute(query, swipes=request.args.get('swipes'), 
+                                   dining_dollars=request.args.get('dining_dollars'), 
+                                    points=request.args.get('points'), flex=request.args.get('flex')).fetchall()
+    return render_template("account_tracking.html", data= mealPlan_data)
 
 
 if __name__ == "__main__":
