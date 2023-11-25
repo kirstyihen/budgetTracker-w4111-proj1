@@ -7,65 +7,32 @@
       </style>
     
   <body>
-  <form style="display: inline-block;" action="/budgetTracker/savings" method="post">
-    <input type="submit" value="Savings Account" onclick="document.getElementById('savings').style.display='block'">
+  <form style="display: inline-block;" action="/budgetTracker/transactions_history" method="post">
+    <input type="submit" value="Transactions History" onclick="document.getElementById('transactions_history').style.display='block'">
   </form>
   
-  <div id="savings" style="display:none">
-    {% if savingsAccount_data %}
+  <div id="transactions_history" style="display:none">
+    {% if transaction_data %}
     <table border="1">
       <tr>
-        <th>Balance</th>
+        <th>Transaction ID</th>
+        <th>Date of Transaction</th>
+        <th>Amount</th>
+        <th>Location</th>
+        <th>Purpose</th>
+        <th>AccountID</th>
+        <th>Type</th>
+
       </tr>
-      {% for row in savingsAccount_data %}
+      {% for row in transaction_data %}
       <tr>
-        <td>{{ row.balance }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% endif %}
-  </div>
-
-
-  <form style="display: inline-block;" action="/budgetTracker/checkings" method="post">
-    <input type="submit" value="Checkings Account" onclick = "document.getElementById('checkings').style.display='block'">
-  </form>
-
-  <div id="checkings" style="display:none">
-  {% if checkingsAccount_data %}
-      <table border="1">
-          <tr>
-              <th>Balance</th>
-          </tr>
-          {% for row in checkingsAccount_data %}
-              <tr>
-                  <td>{{ row.balance }}</td>
-              </tr>
-          {% endfor %}
-      </table>
-  {% endif %}
-  </div>
-
-  <form style="display: inline-block;" action="/budgetTracker/meal_plan" method="post">
-    <input type="submit" value="Dinning Plan" onclick="document.getElementById('meal_plan').style.display='block'">
-  </form>
-
-  <div id="meal_plan" style="display:none">
-    {% if mealPlan_data %}
-    <table border="1">
-      {% for column in mealPlan_data %}
-      <tr>
-        <th>Swipes</th>
-        <th>Dinning Dollars</th>
-        <th>Points</th>
-        <th>Flex</th>
-      </tr>
-      {% for row in mealPlan_data %}
-      <tr>
-        <td>{{row.swipes}}</td>
-        <td>{{row.dining_dollars}}</td>
-        <td>{{row.points}}</td>
-        <td>{{row.flex}}</td>
+        <td>{{ row.transactionid }}</td>
+        <td>{{ row.dateoftransaction }}</td>
+        <td>{{ row.amount }}</td>
+        <td>{{ row.location }}</td> 
+        <td>{{ row.purpose }}</td>
+        <td>{{ row.accountid }}</td>
+        <td>{{ row.type }}</td>
       </tr>
       {% endfor %}
     </table>
