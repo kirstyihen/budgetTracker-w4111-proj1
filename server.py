@@ -10,7 +10,7 @@ Read about it online.
 """
 import os
   # accessible as a variable in index.html:
-from sqlalchemy import *
+from sqlalchemy import create_engine, text 
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, abort
 
@@ -41,16 +41,14 @@ engine = create_engine(DATABASEURI)
 # Example of running queries in your database
 # Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
 #
-#conn = engine.connect()
+conn = engine.connect()
 with engine.connect() as conn:
     with conn.begin():
 # The string needs to be wrapped around text()
-
         conn.execute(text("""CREATE TABLE IF NOT EXISTS account_belongsto (
           uni text,
           accountid serial
         );"""))
-
 
         conn.execute(text("""
         INSERT INTO account_belongsto(accountid, uni)
@@ -313,50 +311,65 @@ def teardown_request(exception):
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #  
+
 #Route for budgetTracker
 @app.route('/budgetTracker', methods=['GET'])
 def budgetTracker():
-    query = text("SELECT * FROM user_attends WHERE uni = :uni AND password = :password")
-    login_data = engine.execute(query, uni=request.args.get('uni'), password = request.args.get('password')).fetchall()
-    if login_data:
-        return redirect("/budgetTracker/user_profile?uni=" + request.args.get('uni'))
-    else:
-        return "Invalid username or password"
+   query = text("SELECT username,password FROM user_attends WHERE username = :username AND password = :password")
+   login_cursor = engine.execute(query, username=request.args.get('username'), password=request.args.get('password'))
+   login_data = login_cursor.fetchall()
+   if request.args.get('username') not in login_data or login_data[request.args.get('username')] != request.args.get('password'):
+      return "Invalid username or password"
+   else:
+      return redirect("/budgetTracker/user_profile?uni=" + request.args.get('username'))
 
-# Route for User Profile
-@app.route('/budgetTracker/user_profile', methods=['POST'])
-def user_profile():
+   
+  # login_data = {"queEats":"bubbles45", "willowrah":"camel99", "elizaTea":"gelly24", "tiaraApple":"caramel09", "pattyOprah":"crystal78", "jmoney":"bakery57", "bennyBandz": "kutie45", "brownErros":"skyWall30", "joelOlle":"rippl3s78", "tonyGre":"puddles35"}
+  # if request.args.get('username') in login_data and login_data[request.args.get('username')] == request.args.get('password'):
+  #     return redirect("/budgetTracker/user_profile?uni=" + request.args.get('username'))
+  # else:
+  #     return "Invalid username or password"
+
+
+# Endpoint for User Profile
+@app.route('/budgetTracker/user_profile/<username>', methods=['POST'])
+def user_profile(username):
     query = text("SELECT * FROM user_attends WHERE uni = :uni")
     user_profile_data = engine.execute(query, uni=request.args.get('uni')).fetchall()
     return render_template("user_profile.html", data = user_profile_data)
 
-@app.route('/budgetTracker/SignUp', methods= ['PUT'])
+@app.route('/budgetTracker/SignUp', methods= ['POST'])
 def signUp():
    query = text("INSERT INTO user_attends(uni, name, username, password, schoolcode) VALUES (:uni, :name, :username, :password, :schoolcode)")  
    engine.execute(query, uni=request.args.get('uni'), name=request.args.get('name'), username=request.args.get('username'), password=request.args.get('password'), schoolcode=request.args.get('schoolcode'))
    
-# Route for Account Tracking
-@app.route('/budgetTracker/savings', methods=['POST'])
+# Endpoint for Savings
+@app.route('/budgetTracker/savings', methods=['GET','POST'])
 def savings():
     with engine.connect() as conn:
       query = text("SELECT balance FROM savings_acount WHERE accountid = :accountid")
       savingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
-      return render_template("account_tracking.html", data= savingsAccount_data)
+      return render_template("user_profile.html", data= savingsAccount_data)
       
-@app.route('/budgetTracker/checkings', methods=['POST'])
+@app.route('/budgetTracker/checkings', methods=[ 'GET','POST'])
 def checkings():
     query = text("SELECT balance FROM checkings_account WHERE accountid = :accountid")
     checkingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
-    return render_template("account_tracking.html", data= checkingsAccount_data)
+    return render_template("user_profile.html", data= checkingsAccount_data)
 
-@app.route('/budgetTracker/meal_plan', methods=['POST'])
+@app.route('/budgetTracker/meal_plan', methods=['GET','POST'])
 def mealPlan():
     query = text("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = :accountid")
     mealPlan_data = engine.execute(query, swipes=request.args.get('swipes'), 
                                    dining_dollars=request.args.get('dining_dollars'), 
                                     points=request.args.get('points'), flex=request.args.get('flex')).fetchall()
-    return render_template("account_tracking.html", data= mealPlan_data)
+    return render_template("user_profile.html", data= mealPlan_data)
 
+@app.route('/budgetTracker/transactions_history', methods=['GET','POST'])
+def mealPlan():
+    query = text("SELECT * FROM transaction_acchis WHERE accountid = :accountid")
+    transaction_data = engine.execute(query, accountid=request.args.get('accountid')).fetchall()
+    return render_template("account_tracking.html", data= transaction_data)
 
 if __name__ == "__main__":
   import click
