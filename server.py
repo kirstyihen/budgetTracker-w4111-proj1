@@ -97,11 +97,13 @@ def login():
 
     
 # Endpoint for User Profile
-@app.route('/user_profile/<name>', methods=['POST'])
+@app.route('/user_profile.html', methods=['POST', 'GET'])
 def user_profile(name):
-    query = text("SELECT u.* FROM user_attends u JOIN institutions i ON u.uni = i.uni WHERE u.uni = :uni")
+  with engine.connect() as conn:
+    name_param = request.args.get('name')
+    query = text("SELECT u.* FROM user_attends u JOIN institutions i ON u.uni = i.uni WHERE u.uni = :uni AND u.name = :name")
     user_profile_data = conn.execute(query).fetchall()
-    return render_template("user_profile.html", data = user_profile_data)
+  return render_template("user_profile.html", data = user_profile_data)
 
 # Endpoint for Savings
 @app.route('/savings', methods=['GET','POST'])
