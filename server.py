@@ -12,7 +12,7 @@ import os
   # accessible as a variable in index.html:
 from sqlalchemy import create_engine, text 
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, abort
+from flask import Flask, jsonify, request, render_template, g, redirect, Response, abort
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -69,15 +69,25 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
+def isValidUni(uni):
+  with engine.connect() as conn:
+    uni_param = request.args.get('uni')
+    query = text("SELECT * FROM user_attends WHERE uni = :uni")
+    login_data = conn.execute(query, {"uni": uni_param}).fetchall()
+  return login_data > 0  # Valid if at least one record exists for the given uni
+
 #Endpoint for budgetTracker
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
-   query = text("SELECT * FROM user_attends WHERE uni = :uni")
-   login_data = conn.execute(query, uni=request.args.get('uni')).fetchall()
-   if request.args.get('uni') not in login_data: 
-      return "Invalid uni"
-   else:
-      return redirect("/user_profile/?name=" + request.args.get('name'))
+  if request.method == 'POST':
+    uni = request.json.get('uni')
+    name = request.json.get('name')
+    if not isValidUni(uni):
+       return jsonify(valid=False)
+    else:
+        return redirect("/user_profile/?name=" + name)
+  else:
+     return render_template("index.html")
 
 # Endpoint for User Profile
 @app.route('/user_profile/<name>', methods=['POST'])
