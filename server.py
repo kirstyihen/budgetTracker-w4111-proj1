@@ -28,7 +28,7 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://gravano:foobar@34.75.94.195/proj1part2"
 #
-DATABASEURI = "postgresql://ihenetu:908176@34.74.171.121/proj1part2"
+DATABASEURI = "postgresql://mki2104:908176@34.74.171.121/proj1part2"
 
 
 #
@@ -41,240 +41,7 @@ engine = create_engine(DATABASEURI, pool_pre_ping=True)
 # Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
 #
 conn = engine.connect()
-with engine.connect() as conn:
-    with conn.begin():
-# The string needs to be wrapped around text()
-        conn.execute(text("""CREATE TABLE IF NOT EXISTS account_belongsto (
-          uni text,
-          accountid serial
-        );"""))
-
-        conn.execute(text("""
-        INSERT INTO account_belongsto(accountid, uni)
-        VALUES
-          (10023423411, 'qwe1234'),
-          (10024723422, 'wer2345'),
-          (10067820402, 'ert3456'),
-          (10020708002, 'tea2120'),
-          (10011108202, 'pao6790'),
-          (10018100002, 'jam6078'),
-          (10099808101, 'bji8432'),
-          (10080808008, 'bfe7406'),
-          (10023323300, 'joo8920'),
-          (10023325079, 'ton5079');
-        """))
-    conn.commit()
-    
-    with engine.connect() as conn:
-        with conn.begin():
-        
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS checkings_account (
-            accountid serial,
-            balance NUMERIC
-          );"""))
-          #conn.commit()
-
-          conn.execute(text("""
-          INSERT INTO checkings_acoount(accountid, balance)
-          VALUES
-            (10023423411, 5000),
-            (10024723422, 6700),
-            (10067820402, 506),
-            (10020708002, 100),
-            (10011108202, 250),
-            (10018100002, 300),
-            (10099808101, 10000),
-            (10080808008, 350),
-            (10023323300, 2000),
-            (10023325079, 450);
-          """))
-    conn.commit()
-    
-    with engine.connect() as conn:
-        with connection.begin():
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS dining_attachedto (
-            accountid serial,
-            swipes NUMERIC,
-            dinning_dollars NUMERIC,
-            points NUMERIC,
-            flex NUMERIC,
-            mealplanname text
-          );"""))
-        #conn.commit()
-
-          conn.execute(text("""
-          INSERT INTO dining_attachedto(accountid, swipes, dining_dollars, points, flex, mealplanname)
-          VALUES
-            (10023423411, 210, 100, 0, 100, 'PlanA'),
-            (10024723422, 210, 100, 0, 100, 'PlanA'),
-            (10067820402, 210, 100, 0, 100, 'PlanA'),
-            (10020708002, 150, 75, 0, 75, 'PlanC'),
-            (10011108202, 30, 0, 150, 0, 'BarPlanD'),
-            (10018100002, 75, 0, 0, 75, 'GSPlan'),
-            (10099808101, 125, 0, 400, 0, 'BarPlanB'),
-            (10080808008, 0, 0, 500, 0, 'BarPlanE'),
-            (10023323300, 210, 0, 0, 0, 'PlanA2'),
-            (10023325079, 100, 0, 125, 0, 'PlanD');
-          """))
-    conn.commit()
-
-    with engine.connect() as conn:
-        with conn.begin():
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS has_plan (
-            schoolcode text,
-            mealplannname text
-          );"""))
-          
-
-          conn.execute(text("""
-          INSERT INTO has_plan(schoolcode, mealplanname)
-          VALUES
-            (2456, 'PlanA'),
-            (2456, 'PlanB'),
-            (2456, 'PlanC'),
-            (2456, 'PlanD'),
-            (2456, 'PlanA2'),
-            (2456, 'PlanB2'),
-            (2708, 'BarPlanA'),
-            (2708, 'BarPlanB'),
-            (2708, 'BarPlanC'),
-            (2708, 'BarPlanD'),
-            (2708, 'BarPlanE'),
-            (2706, 'GSPlan'),
-            (2707, 'PlanA'),
-            (2707, 'PlanA2'),
-            (2707, 'PlanB'),
-            (2707, 'PlanB2'),
-            (2707, 'PlanC'),
-            (2707, 'PlanD');
-          """))
-    conn.commit()
-    with engine.connect() as conn:
-        with conn.begin():
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS institutions (
-            school text,
-            schoolcode text
-          );"""))
-          #conn.commit()
-
-          conn.execute(text("""
-          INSERT INTO institutions(school, schoolcode)
-          VALUES
-            ('Barnard College', 2708),
-            ('Columbia College', 2456),
-            ('General Studies', 2706),
-            ('SEAS', 2707);
-          """))
-    conn.commit()
-    with engine.connect() as conn:
-        with connection.begin():
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS meal_plan (
-            mealplanname text,
-            swipes NUMERIC,
-            flex NUMERIC,
-            dinning_dollars NUMERIC,
-            points NUMERIC
-          );"""))
-          #conn.commit()
-
-          conn.execute(text("""
-          INSERT INTO meal_plan(mealplanname, swipes, flex, dining_dollars, points)
-          VALUES
-            ('PlanA', 210, 100, 100, 0),
-            ('PlanA2', 210, 0, 0, 0),
-            ('PlanB', 175, 100, 100, 0),
-            ('PlanB2', 175, 0, 200, 0),
-            ('PlanC', 150, 75, 75, 0),
-            ('PlanD', 100, 0, 125, 0),
-            ('BarPlanA', 150, 0, 0, 625),
-            ('BarPlanB', 125, 0, 0, 400),
-            ('BarPlanC', 75, 0, 0, 200),
-            ('BarPlanD', 30, 0, 0, 150),
-            ('BarPlanE', 0, 0, 0, 500),
-            ('GSPlan', 75, 0, 75, 0);
-          """))
-    conn.commit()
-    with engine.connect() as conn:
-        with connection.begin():
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS savings_account (
-            accountid serial,
-            balance NUMERIC
-          );"""))
-          #conn.commit()
-
-          conn.execute(text("""
-          INSERT INTO savings_account(accountid, balance)
-          VALUES
-            (10023423411, 30459),
-            (10024723422, 25789),
-            (10067820402, 40210),
-            (10020708002, 10230),
-            (10011108202, 45260),
-            (10018100002, 23200),
-            (10099808101, 37233),
-            (10080808008, 94039),
-            (10023323300, 76034),
-            (10023325079, 66535);
-          """))
-    conn.commit()
-
-    with engine.connect() as conn:
-        with connection.begin():
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS transaction_acchis (
-            transactionid serial,
-            dateoftransaction Date,
-            amount NUMERIC,
-            location text,
-            purpose text,
-            accountid text,
-            type text
-          );"""))
-          #conn.commit()
-
-          conn.execute(text("""
-          INSERT INTO transaction_acchis(transactionid, dateoftransaction, amount, location, purpose, accountid, type)
-          VALUES
-            (9764315, '2023-10-17', 1, 'grace dodge', 'lunch', 10067820402, 'swipe'),
-            (2387469, '2023-10-02', 1, 'jjs', '2am snack', 10020708002, 'swipe'),
-            (5641987, '2023-09-10', 1, 'chef dons', 'late lunch', 10011108202, 'swipe'),
-            (7192834, '2023-09-10', 1, 'chef mikes', 'breakfast', 10018100002, 'swipe'),
-            (3629157, '2023-09-04', 1, 'john jay', 'breakfast', 10099808101, 'swipe'),
-            (4897263, '2023-09-04', 10, 'cafe east', 'sushi', 10080808008, 'points'),
-            (6518274, '2023-09-15', 10, 'blue java', 'coffee', 10023323300, 'money'),
-            (5738912, '2023-08-30', 10, 'blue java', 'coffee', 10023323300, 'flex'),
-            (1245897, '2023-10-20', 1, 'Ferris', 'lunch', 10023423411, 'swipe'),
-            (8357462, '2023-10-31', 1, 'john-jay', 'dinner', 10023423411, 'swipe');
-          """))
-    conn.commit()
-    
-    with engine.connect() as conn:
-        with connection.begin():
-          conn.execute(text("""CREATE TABLE IF NOT EXISTS user_attends (
-            uni text,
-            name text,
-            username text,
-            password text,
-            schoolcode text
-          );"""))
-          #conn.commit()
-
-          conn.execute(text("""
-          INSERT INTO user_attends(uni, name, username, password, schoolcode)
-          VALUES
-            ('qwe1234', 'que', 'queEats', 'bubbles45', 2708),
-            ('wer2345', 'willow', 'willowrah', 'camel99', 2708),
-            ('ert3456', 'eliza', 'elizaTea', 'gelly34', 2708),
-            ('tea2120', 'tiara', 'tiaraApple', 'caramel09', 2706),
-            ('pao6790', 'patrick', 'pattyOprah', 'crystal78', 2707),
-            ('jam6078', 'james', 'jmoney', 'bakery57', 2456),
-            ('bji8432', 'benjamin', 'bennyBandz', 'kutie45', 2456),
-            ('bfe7406', 'brown', 'brownErros', 'skyWall30', 2456),
-            ('joo8920', 'joel', 'joelOlle', 'rippl3s78', 2706),
-            ('ton5079', 'anthony', 'tonyGre', 'puddles35', 2708);
-          """))
-
-    conn.commit()
-
+conn.commit()
 @app.before_request
 def before_request():
   """
@@ -302,14 +69,6 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
-#
-# Budget Tracker 1st attempt
-#
-#     localhost:8111/another
-#
-# Notice that the function name is another() rather than index()
-# The functions for each app.route need to have different names
-#  
 
 #Route for budgetTracker
 @app.route('/budgetTracker', methods=['GET'])
@@ -365,7 +124,7 @@ def mealPlan():
     return render_template("user_profile.html", data= mealPlan_data)
 
 @app.route('/budgetTracker/transactions_history', methods=['GET','POST'])
-def mealPlan():
+def transactionHistory():
     query = text("SELECT * FROM transaction_acchis WHERE accountid = :accountid")
     transaction_data = engine.execute(query, accountid=request.args.get('accountid')).fetchall()
     return render_template("account_tracking.html", data= transaction_data)
@@ -376,7 +135,7 @@ if __name__ == "__main__":
   @click.command()
   @click.option('--debug', is_flag=True)
   @click.option('--threaded', is_flag=True)
-  @click.argument('HOST', default='35.196.85.113')
+  @click.argument('HOST', default='0.0.0.0')
   @click.argument('PORT', default=8111, type=int)
   
   def run(debug, threaded, host, port):
