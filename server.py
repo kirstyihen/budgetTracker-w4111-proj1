@@ -69,64 +69,51 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
-
-#Route for budgetTracker
-@app.route('/budgetTracker', methods=['GET'])
-def budgetTracker():
-   query = text("SELECT username,password FROM user_attends WHERE username = :username AND password = :password")
-   login_cursor = engine.execute(query, username=request.args.get('username'), password=request.args.get('password'))
-   login_data = login_cursor.fetchall()
-   if request.args.get('username') not in login_data or login_data[request.args.get('username')] != request.args.get('password'):
-      return "Invalid username or password"
+#Endpoint for budgetTracker
+@app.route('/', methods=['GET'])
+def index():
+   query = text("SELECT * FROM user_attends WHERE uni = :uni")
+   login_data = conn.execute(query, uni=request.args.get('uni')).fetchall()
+   if request.args.get('uni') not in login_data: 
+      return "Invalid uni"
    else:
-      return redirect("/budgetTracker/user_profile?uni=" + request.args.get('username'))
-
-   
-  # login_data = {"queEats":"bubbles45", "willowrah":"camel99", "elizaTea":"gelly24", "tiaraApple":"caramel09", "pattyOprah":"crystal78", "jmoney":"bakery57", "bennyBandz": "kutie45", "brownErros":"skyWall30", "joelOlle":"rippl3s78", "tonyGre":"puddles35"}
-  # if request.args.get('username') in login_data and login_data[request.args.get('username')] == request.args.get('password'):
-  #     return redirect("/budgetTracker/user_profile?uni=" + request.args.get('username'))
-  # else:
-  #     return "Invalid username or password"
-
+      return redirect("/user_profile/?name=" + request.args.get('name'))
 
 # Endpoint for User Profile
-@app.route('/budgetTracker/user_profile/<username>', methods=['POST'])
-def user_profile(username):
-    query = text("SELECT * FROM user_attends WHERE uni = :uni")
-    user_profile_data = engine.execute(query, uni=request.args.get('uni')).fetchall()
+@app.route('/user_profile/<name>', methods=['POST'])
+def user_profile(name):
+    query = text("SELECT u.* FROM user_attends u JOIN institutions i ON u.uni = i.uni WHERE u.uni = :uni")
+    user_profile_data = conn.execute(query).fetchall()
     return render_template("user_profile.html", data = user_profile_data)
 
-@app.route('/budgetTracker/SignUp', methods= ['POST'])
-def signUp():
-   query = text("INSERT INTO user_attends(uni, name, username, password, schoolcode) VALUES (:uni, :name, :username, :password, :schoolcode)")  
-   engine.execute(query, uni=request.args.get('uni'), name=request.args.get('name'), username=request.args.get('username'), password=request.args.get('password'), schoolcode=request.args.get('schoolcode'))
-   
 # Endpoint for Savings
-@app.route('/budgetTracker/savings', methods=['GET','POST'])
+@app.route('/savings', methods=['GET','POST'])
 def savings():
     with engine.connect() as conn:
-      query = text("SELECT balance FROM savings_acount WHERE accountid = :accountid")
-      savingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
+      query = text("SELECT s.* FROM savings_account s JOIN account_belongsto ab ON s.accountid = ab.accountid WHERE ab.accountid = :accountid")
+      savingsAccount_data = conn.execute(query, balance=request.args.get('balance')).fetchall()
       return render_template("user_profile.html", data= savingsAccount_data)
       
-@app.route('/budgetTracker/checkings', methods=[ 'GET','POST'])
+@app.route('/checkings', methods=[ 'GET','POST'])
 def checkings():
-    query = text("SELECT balance FROM checkings_account WHERE accountid = :accountid")
-    checkingsAccount_data = engine.execute(query, balance=request.args.get('balance')).fetchall()
+    query = text("SELECT c.* FROM checkings_account c JOIN account_belongsto ab ON c.accountid = ab.accountid WHERE ab.accountid = :accountid")
+    checkingsAccount_data = conn.execute(query, balance=request.args.get('balance')).fetchall()
     return render_template("user_profile.html", data= checkingsAccount_data)
 
-@app.route('/budgetTracker/meal_plan', methods=['GET','POST'])
+@app.route('/meal_plan', methods=['GET','POST'])
 def mealPlan():
     query = text("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = :accountid")
-    mealPlan_data = engine.execute(query, swipes=request.args.get('swipes'), 
+    query2= text("SELECT mp.* FROM meal_plan mp JOIN has_plan hp ON mp.mealplanname = hp.mealplanname")
+    mealPlan_data = conn.execute(query, swipes=request.args.get('swipes'), 
                                    dining_dollars=request.args.get('dining_dollars'), 
                                     points=request.args.get('points'), flex=request.args.get('flex')).fetchall()
-    return render_template("user_profile.html", data= mealPlan_data)
+    mealPlan_data2 = conn.execute(query2, mealplanname = request.args.get('mealplanname')).fetchall()
+    return render_template("user_profile.html", data= mealPlan_data, data2= mealPlan_data2)
 
-@app.route('/budgetTracker/transactions_history', methods=['GET','POST'])
+@app.route('/transactions_history', methods=['GET','POST'])
 def transactionHistory():
     query = text("SELECT * FROM transaction_acchis WHERE accountid = :accountid")
-    transaction_data = engine.execute(query, accountid=request.args.get('accountid')).fetchall()
+    transaction_data = conn.execute(query, accountid=request.args.get('accountid')).fetchall()
     return render_template("account_tracking.html", data= transaction_data)
 
 if __name__ == "__main__":
@@ -150,10 +137,11 @@ if __name__ == "__main__":
         python3 server.py --help
 
     """
-
+   
     HOST, PORT = host, port
     print("running on %s:%d" % (HOST, PORT))
     app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
 
   run()
+
 
