@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+    <title>Login</title>
+</head>
+
+<body>
+    <h1>Login</h1>
+    <form action="/login" method="post">
+        <label for="uni">Uni:</label>
+        <input type="text" id="uni" name="uni">
+        <button type="button" onclick="checkUniValidity()">Submit</button>
+    </form>
+    <script>
+        function checkUniValidity() {
+          var uni = document.getElementById("uni").value;
+          if (uni.length < 7) {
+            alert("Uni must be at least 7 characters long");
+          } else {
+            window.location.href = 'user_profile.html';
+          }
+        }
+      </script>
+</body>
+
+</html>

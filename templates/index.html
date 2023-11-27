@@ -12,27 +12,14 @@
 <body>
   <h1>Welcome To Budget Tracker!</h1>
   <p>This is a simple budget tracker app that tracks your transactions and account balances.</p>
-  <img src="budget.jpg" alt="background pic" width="700" height="450" style="border: 1px solid black;">
-  <form action="/" method="post">
-    <label for="uni">Uni:</label>
-    <input type="text" id="uni" name="uni">
-    <button type="button" onclick="checkUniValidity()">Submit</button>
-  </form>
+  <div>
+  <button type="button" onclick="window.location.href = 'login.html'">Login</button>
+  </div>
+  
  <nav>
      <li><a href="user_profile.html"> User profile</a></li>
      <li><a href="account_tracking.html"> accounts </a></li>
  </nav>
-  <script>
-    function checkUniValidity() {
-      var uni = document.getElementById("uni").value;
-      if (uni.length < 7) {
-        alert("Uni must be at least 7 characters long");
-      } else {
-        window.location.href = 'user_profile.html';
-      }
-    }
-  </script>
 </body>
-
 
 </html>
