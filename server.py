@@ -17,7 +17,6 @@ from flask import Flask, request, render_template, g, redirect, Response, abort
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
-
 #
 # The following is a dummy URI that does not connect to a valid database. You will need to modify it to connect to your Part 2 database in order to use the data.
 #
@@ -29,13 +28,13 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://gravano:foobar@34.75.94.195/proj1part2"
 #
-DATABASEURI = "postgresql://ihenetu:908176@34.75.94.195/proj1part2"
+DATABASEURI = "postgresql://ihenetu:908176@34.74.171.121/proj1part2"
 
 
 #
 # This line creates a database engine that knows how to connect to the URI above.
 #
-engine = create_engine(DATABASEURI)
+engine = create_engine(DATABASEURI, pool_pre_ping=True)
 
 #
 # Example of running queries in your database
@@ -377,8 +376,9 @@ if __name__ == "__main__":
   @click.command()
   @click.option('--debug', is_flag=True)
   @click.option('--threaded', is_flag=True)
-  @click.argument('HOST', default='0.0.0.0')
+  @click.argument('HOST', default='35.196.85.113')
   @click.argument('PORT', default=8111, type=int)
+  
   def run(debug, threaded, host, port):
     """
     This function handles command line parameters.
