@@ -91,36 +91,41 @@ def login():
       if not isValidUni(uni):
         return jsonify(valid=False)
       else:
-          return redirect("/user_profile/?name=" + name)
+          return redirect("/user_profile.html")
     else:
       return render_template("login.html")
 
-    
 # Endpoint for User Profile
 @app.route('/user_profile.html', methods=['POST', 'GET'])
-def user_profile(name):
-  with engine.connect() as conn:
-    name_param = request.args.get('name')
-    query = text("SELECT u.* FROM user_attends u JOIN institutions i ON u.uni = i.uni WHERE u.uni = :uni AND u.name = :name")
-    user_profile_data = conn.execute(query).fetchall()
-  return render_template("user_profile.html", data = user_profile_data)
+def user_profile():
+    with engine.connect() as conn:
+        if request.method == 'POST':
+            query = text("SELECT u.* FROM user_attends u JOIN institutions i ON u.uni = i.uni WHERE u.uni = :uni AND u.name = :name")
+            user_profile_data = conn.execute(query, {"name": name}).fetchall()
+            return render_template("user_profile.html", data=user_profile_data)  
+    return render_template("user_profile.html")
 
 # Endpoint for Savings
-@app.route('/savings', methods=['GET','POST'])
+@app.route('/savings', methods=['POST'])
 def savings():
-    with engine.connect() as conn:
-      query = text("SELECT s.* FROM savings_account s JOIN account_belongsto ab ON s.accountid = ab.accountid WHERE ab.accountid = :accountid")
-      savingsAccount_data = conn.execute(query, balance=request.args.get('balance')).fetchall()
-      return render_template("user_profile.html", data= savingsAccount_data)
+  with engine.connect() as conn:
+    savings_param =request.args.get('balance')
+    query = text("SELECT s.* FROM savings_account s JOIN account_belongsto ab ON s.accountid = ab.accountid WHERE ab.accountid = :accountid")
+    savingsAccount_data = conn.execute(query, {"balance": savings_param}).fetchall()
+  return savingsAccount_data
       
-@app.route('/checkings', methods=[ 'GET','POST'])
+#@app.route('/checkings', methods=[ 'GET','POST'])
 def checkings():
+  with engine.connect() as conn:
+    checkings_param = request.args.get('balance')
     query = text("SELECT c.* FROM checkings_account c JOIN account_belongsto ab ON c.accountid = ab.accountid WHERE ab.accountid = :accountid")
-    checkingsAccount_data = conn.execute(query, balance=request.args.get('balance')).fetchall()
-    return render_template("user_profile.html", data= checkingsAccount_data)
+    checkingsAccount_data = conn.execute(query, {"balance": checkings_param}).fetchall()
+  return checkingsAccount_data
 
-@app.route('/meal_plan', methods=['GET','POST'])
+#@app.route('/meal_plan', methods=['GET','POST'])
 def mealPlan():
+  with engine.connect() as conn:
+    mealplan_param = request.args.get('swipes')
     query = text("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = :accountid")
     query2= text("SELECT mp.* FROM meal_plan mp JOIN has_plan hp ON mp.mealplanname = hp.mealplanname")
     mealPlan_data = conn.execute(query, swipes=request.args.get('swipes'), 
@@ -131,9 +136,11 @@ def mealPlan():
 
 @app.route('/transactions_history', methods=['GET','POST'])
 def transactionHistory():
-    query = text("SELECT * FROM transaction_acchis WHERE accountid = :accountid")
-    transaction_data = conn.execute(query, accountid=request.args.get('accountid')).fetchall()
-    return render_template("account_tracking.html", data= transaction_data)
+  with engine.connect() as conn:
+    if request.method == 'POST':
+      query = text("SELECT * FROM transaction_acchis WHERE accountid = :accountid")
+      transaction_data = conn.execute(query, accountid=request.args.get('accountid')).fetchall()
+      return render_template("account_tracking.html", data= transaction_data)
 
 if __name__ == "__main__":
   import click
