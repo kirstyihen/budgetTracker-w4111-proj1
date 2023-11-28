@@ -7,11 +7,11 @@
       </style>
     
   <body>
-  <form style="display: inline-block;" action="/transactions_history" method="post">
-    <input type="submit" value="Transactions History" onclick="document.getElementById('transactions_history').style.display='block'">
+  <form style="display: inline-block;" action="/account_tracking.html" method="post">
+    <input type="submit" value="Transactions History" onclick="document.getElementById('transactions_data').style.display='block'">
   </form>
   
-  <div id="transactions_history" style="display:none">
+  <div id="transactions_data" style="display:none">
     {% if transaction_data %}
     <table border="1">
       <tr>

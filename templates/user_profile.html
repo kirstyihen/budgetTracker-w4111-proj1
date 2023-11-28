@@ -8,14 +8,14 @@
 
 
 <body>
-  <h1>Hi User!</h1>
+  <h1>Welcome {{ name }}! </h1>
   <nav>
     <ul>
         <a href="account_tracking.html"> Transaction History </a>
     </ul>
   </nav>
-  <form style="display: inline-block;" id="savingsForm" action="/savings" method="post">
-    <input type="submit" value="Savings Account" onclick="openSavings()">
+  <form style="display: inline-block;" id="savingsForm" action="/savings" method="get">
+    <input type="submit" value="Savings Account" onclick="savings()">
   </form>
   
   <div id="savings" style="display:none">
@@ -61,7 +61,6 @@
   <div id="meal_plan" style="display:none">
     {% if mealPlan_data %}
       <table border="1">
-        {% for column in mealPlan_data %}
           <tr>
             <th>Swipes</th>
             <th>Dinning Dollars</th>
@@ -76,7 +75,6 @@
               <td>{{row.flex}}</td>
             </tr>
           {% endfor %}
-        {%endfor%}
       </table>
     {% endif %}
   </div>

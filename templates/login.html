@@ -11,15 +11,28 @@
         <button type="button" onclick="checkUniValidity()">Submit</button>
     </form>
     <script>
-        function checkUniValidity() {
-          var uni = document.getElementById("uni").value;
-          if (uni.length < 7) {
-            alert("Uni must be at least 7 characters long");
+      function checkUniValidity() {
+        var uni = document.getElementById("uni").value;
+        fetch('/login.html', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ uni: uni }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.valid) {
+            window.location.href = 'user_profile.html/{}';
           } else {
-            window.location.href = 'user_profile.html';
+            alert("Invalid Uni");
           }
-        }
-      </script>
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }
+    </script>
 </body>
 
 </html>
