@@ -7,12 +7,13 @@
       </style>
     
   <body>
+  <h1>Account Tracking</h1>
   <form style="display: inline-block;" action="/account_tracking.html" method="post">
     <input type="submit" value="Transactions History" onclick="document.getElementById('transactions_data').style.display='block'">
   </form>
   
   <div id="transactions_data" style="display:none">
-    {% if transaction_data %}
+    {% if dict %}
     <table border="1">
       <tr>
         <th>Transaction ID</th>
@@ -24,15 +25,15 @@
         <th>Type</th>
 
       </tr>
-      {% for row in transaction_data %}
+      {% for row in dict %}
       <tr>
-        <td>{{ row.transactionid }}</td>
-        <td>{{ row.dateoftransaction }}</td>
-        <td>{{ row.amount }}</td>
-        <td>{{ row.location }}</td> 
-        <td>{{ row.purpose }}</td>
-        <td>{{ row.accountid }}</td>
-        <td>{{ row.type }}</td>
+        <td>{{ dict['transactionid']}}</td>
+        <td>{{ dict ['dateoftransaction'] }}</td>
+        <td>{{ dict['amount'] }}</td>
+        <td>{{ dict['location'] }}</td> 
+        <td>{{ dict['purpose'] }}</td>
+        <td>{{ dict['accountid'] }}</td>
+        <td>{{ dict['typ'] }}</td>
       </tr>
       {% endfor %}
     </table>

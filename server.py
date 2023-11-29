@@ -137,7 +137,7 @@ def user_profile(name):
     #cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     query = text('SELECT u.schoolcode, i.school FROM user_attends u JOIN institutions i ON u.schoolcode = i.schoolcode WHERE u.uni = :uni ')
     params = {'uni': uni}
-    result = g.conn.execute( query, params)
+    result = g.conn.execute(query, params)
     g.conn.commit()
     #print(result)
     for i in result:
@@ -182,7 +182,6 @@ def checkings():
        
     return render_template("user_profile.html", info = {'accountid': accountid, 'balance': balance})
 
-from flask import render_template
 
 @app.route('/meal_plan', methods=['GET', 'POST'])
 def mealPlan():
@@ -207,16 +206,22 @@ def mealPlan():
 
 @app.route('/account_tracking.html', methods=['GET','POST'])
 def transactionHistory():
-  with engine.connect() as conn:
-     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-     cursor.execute("SELECT * FROM transaction_acchis WHERE accountid = :accountid")
-     transactionHistorydata = cursor.fetchone()
-     tH = []
-     for value in transactionHistorydata:
-        tH.append(value)
+    uni = session.get('uni', "")
+    query = text('SELECT * FROM transaction_acchis ta JOIN account_belongsto ab ON ta.accountid = ab.accountid AND ab.uni = :uni')
+    params = {'uni': uni}
+    result = g.conn.execute(query, params)
+    g.conn.commit()
+    
+    for i in result:
+       transactionid = i[0]
+       dateoftransaction = i[1]
+       amount = i[2]
+       location = i[3]
+       purpose = i[4]
+       accountid = i[5]
+       typ = i[6]
 
-        #dict = {'transactionid': transactionid, 'dateoftransaction':dateoftransaction, 'amount': amount, 'location': location, 'purpose': purpose, 'accountid': account, 'typ': typ}
-  return render_template("account_tracking.html")
+    return render_template("account_tracking.html", dict = {'transactionid': transactionid, 'dateoftransaction':dateoftransaction, 'amount': amount, 'location': location, 'purpose': purpose, 'accountid': accountid, 'typ': typ} )
 
 
 if __name__ == "__main__":
