@@ -1,38 +1,81 @@
 <!DOCTYPE html>
+<html>
 <head>
-    <title>Login</title>
+  <meta charset="utf-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
+<body style="background-color:#87CEEB;">
+  <nav class="site-header sticky-top py-1">
+    <div class="container d-flex flex-column flex-md-row justify-content-between">
+      <a class="py-2 d-none d-md-inline-block" href="{{ url_for('index') }}"><i class="fas fa-home"></i> Online Budget Tracker </a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="row main">
+      <div class="main-login main-center">
+        <h5>Login User</h5>
+        <form action="{{ url_for('login') }}" method="post">
+          <div class="form-group">
+            <label for="uni" class="cols-sm-2 control-label">Uni</label>
+            <div class="cols-sm-10">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                <input type="text" class="form-control" name="uni" id="uni" placeholder="Enter your Uni" required>
+              </div>
+            </div>
+          </div>
+   
+          <div class="form-group">
+            <label for="username" class="cols-sm-2 control-label">Username</label>
+            <div class="cols-sm-10">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                <input type="text" class="form-control" name="username" placeholder="Username" id="username" required>
+              </div>
+            </div>
+          </div>
 
-<body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <label for="uni">Uni:</label>
-        <input type="text" id="uni" name="uni">
-        <button type="button" onclick="checkUniValidity()">Submit</button>
-    </form>
-    <script>
-      function checkUniValidity() {
-        var uni = document.getElementById("uni").value;
-        fetch('/login.html', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ uni: uni }),
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.valid) {
-            window.location.href = 'user_profile.html/{}';
-          } else {
-            alert("Invalid Uni");
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-      }
-    </script>
+          <div class="form-group">
+            <label for="name" class="cols-sm-2 control-label">Name</label>
+            <div class="cols-sm-10">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                <input type="text" class="form-control" name="name" placeholder="Name" id="name" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="cols-sm-2 control-label">Password</label>
+            <div class="cols-sm-10">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-university" aria-hidden="true"></i></span>
+                <input type="password" class="form-control" name="password" placeholder="Password" id="password" required>
+              </div>
+            </div>
+          </div>
+
+          <input type="submit" value="Login" class="form-control btn btn-success" name="">
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-warning alert-dismissible">
+                <a href="/login.html" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+      </div>
+    </div>
+  </div>
 </body>
-
 </html>

@@ -12,13 +12,13 @@ import os
   # accessible as a variable in index.html:
 from sqlalchemy import create_engine, text 
 from sqlalchemy.pool import NullPool
-from flask import Flask, jsonify, request, render_template, g, redirect, Response, abort, session
+from flask import Flask, jsonify, request, render_template, g, redirect, Response, flash, session, url_for
 import psycopg2, psycopg2.extras
 from urllib.parse import urlparse
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
-
+app.secret_key = 'bankprogram-milly'
 #
 # The following is a dummy URI that does not connect to a valid database. You will need to modify it to connect to your Part 2 database in order to use the data.
 #
@@ -34,11 +34,12 @@ DATABASEURI = "postgresql://mki2104:908176@34.74.171.121/proj1part2"
 
 
 result = urlparse(DATABASEURI)
-uni = result.username
+username = result.username
+password = result.password
 database = result.path[1:]
 hostname = result.hostname
 port = result.port
-conn = psycopg2.connect( database = database, uni = uni, host = hostname, port = port )
+conn = psycopg2.connect( database = database, user = username, password = password, host = hostname, port = port )
 
 engine = create_engine(DATABASEURI, pool_pre_ping=True)
 
@@ -75,60 +76,82 @@ def teardown_request(exception):
 def index():
   return render_template("index.html")
 
-def isValidUni(uni):
-    validUni = False
-    with engine.connect() as conn:
-        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cursor.execute("SELECT EXISTS(SELECT 1 FROM user_attends WHERE uni = %s)", (uni,))
-        validUni = cursor.fetchone()[0]
-    return validUni
 
-
+# Endpoint for Login 
 @app.route('/login.html', methods=['POST', 'GET'])
 def login():
-    with engine.connect() as conn:
-        if request.method == 'POST':
-            if "uni" not in request.form:
-                return jsonify(valid=False)
-            
-            uni = request.form["uni"]
-            session[uni] = uni
-            name = request.form["name"]
-            session[name] = name
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-            if not isValidUni(uni):
-                return jsonify(valid=False)
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'uni' in request.form:
+        uni = request.form['uni']
+        username = request.form['username']
+        name = request.form.get("name", "")  # Use get() to handle the case where 'name' is not present
+        password = request.form['password']
+        
+        cursor.execute('SELECT username, password, uni, name FROM user_attends WHERE username = %s', (username,))
+        profile = cursor.fetchone()
+
+        if profile:
+            uni_rs = profile['uni']
+            # If account exists in users table in our database
+            if uni_rs == uni:
+                # Create session data, we can access this data in other routes
+                session['uni'] = profile['uni']
+                session['username'] = profile['username']
+                
+                # Check if 'name' key exists in the profile dictionary
+                if 'name' in profile:
+                    session['name'] = profile['name']
+                else:
+                    session['name'] = ""  # Provide a default value or handle it based on your application logic
+                
+                session['password'] = profile['password']
+
+                # Flash the 'info' dictionary and redirect
+                #flash({'uni': profile['uni'], 'name': session['name'], 'username': profile['username'], 'password': profile['password']})
+                
+                # Redirect to home page
+                return redirect(url_for('user_profile', name=session['name']))
+
             else:
-                return redirect("/user_profile.html/{}".format(name))
+                # Account doesn't exist or uni/password incorrect
+                flash('Incorrect uni or unknown account')
         else:
-            return render_template("login.html")
+            # Account doesn't exist or uni/password incorrect
+            flash('Incorrect uni or unknown account')
+
+    # Add this return statement to handle the case where the conditions are not met
+    return render_template('login.html')
+
 
 # Endpoint for User Profile
-@app.route('/user_profile.html/{}', methods=['POST', 'GET'])
+@app.route('/user_profile.html/<name>', methods=['POST', 'GET'])
 def user_profile(name):
-    with engine.connect() as conn:
-        if request.method == 'POST':
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            cursor.execute("SELECT u.name FROM user_attends u JOIN institutions i ON u.uni = i.uni WHERE u.uni = :uni AND u.name = :name")
-            profile = cursor.fetchone()
+    # Retrieve the data from the session
+    uni = session.get('uni', "")
+    name = session.get('name', "")
+    username = session.get('username', "")
+    password = session.get('password', "")
 
-            p = []
-            for value in profile:
-               p.append(value)
-            info = {'uni': p[0], 'name': p[1], 'username':p[2], 'password':p[3],'schoolcode':[4]}
-            return render_template("user_profile.html",  **info)  
-    return render_template("user_profile.html/{}" **info)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute("SELECT u.schoolcode FROM user_attends u WHERE u.uni = %s AND u.name = %s;", (name, name))
+    schoolcode = cursor.fetchone() #issues with schoolcode, return none
+
+    # Render the template with the retrieved data
+    return render_template("user_profile.html", info={'uni': uni, 'name': name, 'username': username, 'password': password, 'schoolcode': schoolcode})
+
+
+
 
 # Endpoint for Savings
-
 @app.route('/savings', methods=['GET'])
 def savings():
-  with engine.connect() as conn:
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute("SELECT balance FROM savings_account s JOIN account_belongsto ab ON s.accountid = ab.accountid WHERE ab.accountid = %s'", (session['accountid']))
-    balance = cursor.fetchone()
-    
-  return render_template ("user_profile.html/{}", balance = balance)
+    with engine.connect() as conn:
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute("SELECT balance FROM savings_account s JOIN account_belongsto ab ON s.accountid = ab.accountid WHERE ab.accountid = %s", (session['accountid'],))
+        balance = cursor.fetchone() 
+    return render_template("user_profile.html", balance=balance)
 
 #Endpoint for Checkings      
 @app.route('/checkings', methods=['POST'])
@@ -137,24 +160,30 @@ def checkings():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute("SELECT balance FROM checkings_account c JOIN account_belongsto ab ON c.accountid = ab.accountid WHERE ab.accountid = :accountid")
     balance = cursor.fetchone()
-  return render_template ("user_profile.html/{}", balance = balance)
+  return render_template ("user_profile.html", balance = balance)
 
-@app.route('/meal_plan', methods=['GET','POST'])
+from flask import render_template
+
+@app.route('/meal_plan', methods=['GET', 'POST'])
 def mealPlan():
-  with engine.connect() as conn:
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    with engine.connect() as conn:
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    cursor.execute("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = :accountid")
-    dinningdata = cursor.fetchone()
+        cursor.execute("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = %s", (session['accountid'],))
+        dinningdata = cursor.fetchone()
 
-    dd = []
-    for value in dinningdata:
-       dd.append(value)
-      
-    cursor.execute("SELECT mp.* FROM meal_plan mp JOIN has_plan hp ON mp.mealplanname = hp.mealplanname")
-    mealplanname = cursor.fetchone()
-    dict = {'swipes': dd[0], 'dining_dollars': dd[1], 'points': dd[2], 'flex': dd[3], 'mealplanname' : mealplanname}        
-  return render_template("user_profile.html", **dict)
+        cursor.execute("SELECT mp.* FROM meal_plan mp JOIN has_plan hp ON mp.mealplanname = hp.mealplanname")
+        mealplanname = cursor.fetchone()
+
+    # Check if dinningdata is not None before accessing its values
+    if dinningdata:
+        dict_data = {'swipes': dinningdata['swipes'], 'dining_dollars': dinningdata['dining_dollars'], 'points': dinningdata['points'], 'flex': dinningdata['flex'], 'mealplanname': mealplanname}
+
+        return render_template("user_profile.html", **dict_data)
+
+    # Handle the case where dinningdata is None
+    return render_template("user_profile.html", mealplanname=mealplanname)
+
 
 @app.route('/account_tracking.html', methods=['GET','POST'])
 def transactionHistory():
@@ -166,7 +195,7 @@ def transactionHistory():
      for value in transactionHistorydata:
         tH.append(value)
 
-        dict = {'transactionid': tH[0], 'dateoftransaction':tH[1], 'amount': tH[2], 'location': tH[3], 'purpose': tH[4], 'accountid': tH[5], 'type': tH[6]}
+        dict = {'transactionid': transactionid, 'dateoftransaction':dateoftransaction, 'amount': amount, 'location': location], 'purpose': purpose, 'accountid': account, 'typ': typ}
   return render_template("account_tracking.html", **dict)
 
 
