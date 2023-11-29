@@ -13,6 +13,7 @@
   <p>Username: {{ info['username'] }}</p>
   <p>Password: {{ info['password'] }}</p>
   <p>SchoolCode: {{ info['schoolcode'] }}</p>
+  <p>Schoolname: {{ info['schoolname'] }}</p>
   <nav>
     <ul>
         <a href="account_tracking.html"> Transaction History </a>
@@ -30,7 +31,7 @@
           <th>Balance</th>
         </tr>
             <tr>
-              <td>{{ balance }}</td>
+              <td>{{ info['balance'] }}</td>
             </tr>
       </table>
   </div>
@@ -47,7 +48,7 @@
               <th>Balance</th>
           </tr>
               <tr>
-                  <td>{{ balance }}</td>
+                  <td>{{ info['balance'] }}</td>
               </tr>
       </table>
   </div>
@@ -65,10 +66,6 @@
             <th>Flex</th>
           </tr>
             <tr>
-              <td>{{dinningdata['swipes']}}</td>
-              <td>{{dinningdata['dining_dollars']}}</td>
-              <td>{{dinningdata['points']}}</td>
-              <td>{{dinningdata['flex']}}</td>
             </tr>
       </table>
   </div>

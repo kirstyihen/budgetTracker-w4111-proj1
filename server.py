@@ -130,16 +130,22 @@ def login():
 def user_profile(name):
     # Retrieve the data from the session
     uni = session.get('uni', "")
-    name = session.get('name', "")
+    #name = session.get('name', "")
     username = session.get('username', "")
     password = session.get('password', "")
 
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute("SELECT u.schoolcode FROM user_attends u WHERE u.uni = %s AND u.name = %s;", (name, name))
-    schoolcode = cursor.fetchone() #issues with schoolcode, return none
-
+    #cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    query = text('SELECT u.schoolcode, i.school FROM user_attends u JOIN institutions i ON u.schoolcode = i.schoolcode WHERE u.uni = :uni ')
+    params = {'uni': uni}
+    result = g.conn.execute( query, params)
+    g.conn.commit()
+    #print(result)
+    for i in result:
+       schoolcode = i[0]
+       schoolname = i[1]
+   
     # Render the template with the retrieved data
-    return render_template("user_profile.html", info={'uni': uni, 'name': name, 'username': username, 'password': password, 'schoolcode': schoolcode})
+    return render_template("user_profile.html", info={'uni': uni, 'name': name, 'username': username, 'password': password, 'schoolcode': schoolcode, 'schoolname': schoolname })
 
 
 
@@ -147,20 +153,34 @@ def user_profile(name):
 # Endpoint for Savings
 @app.route('/savings', methods=['GET'])
 def savings():
-    with engine.connect() as conn:
-        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cursor.execute("SELECT balance FROM savings_account s JOIN account_belongsto ab ON s.accountid = ab.accountid WHERE ab.accountid = %s", (session['accountid'],))
-        balance = cursor.fetchone() 
-    return render_template("user_profile.html", balance=balance)
+    uni = session.get('uni', "")
+    #cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    query = text('SELECT ab.accountid, s.balance FROM savings_account s JOIN account_belongsto ab ON s.accountid = ab.accountid WHERE ab.uni = :uni')
+    params = {'uni': uni}
+    result = g.conn.execute(query, params)
+    g.conn.commit()
+
+    for i in result:
+       accountid = i[0]
+       balance = i[1]
+       
+    return render_template("user_profile.html", info = {'accountid': accountid, 'balance': balance})
 
 #Endpoint for Checkings      
-@app.route('/checkings', methods=['POST'])
+@app.route('/checkings', methods=['GET', 'POST'])
 def checkings():
-  with engine.connect() as conn:
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute("SELECT balance FROM checkings_account c JOIN account_belongsto ab ON c.accountid = ab.accountid WHERE ab.accountid = :accountid")
-    balance = cursor.fetchone()
-  return render_template ("user_profile.html", balance = balance)
+    uni = session.get('uni', "")
+    #cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    query = text('SELECT ab.accountid, c.balance FROM checkings_account c JOIN account_belongsto ab ON c.accountid = ab.accountid WHERE ab.uni = :uni')
+    params = {'uni': uni}
+    result = g.conn.execute(query, params)
+    g.conn.commit()
+
+    for i in result:
+       accountid = i[0]
+       balance = i[1]
+       
+    return render_template("user_profile.html", info = {'accountid': accountid, 'balance': balance})
 
 from flask import render_template
 
@@ -195,8 +215,8 @@ def transactionHistory():
      for value in transactionHistorydata:
         tH.append(value)
 
-        dict = {'transactionid': transactionid, 'dateoftransaction':dateoftransaction, 'amount': amount, 'location': location], 'purpose': purpose, 'accountid': account, 'typ': typ}
-  return render_template("account_tracking.html", **dict)
+        #dict = {'transactionid': transactionid, 'dateoftransaction':dateoftransaction, 'amount': amount, 'location': location, 'purpose': purpose, 'accountid': account, 'typ': typ}
+  return render_template("account_tracking.html")
 
 
 if __name__ == "__main__":
