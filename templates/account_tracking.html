@@ -8,12 +8,12 @@
     
   <body>
   <h1>Account Tracking</h1>
-  <form style="display: inline-block;" action="/account_tracking.html" method="post">
-    <input type="submit" value="Transactions History" onclick="document.getElementById('transactions_data').style.display='block'">
+  <form style="display: inline-block;" id="transactionsForm" method="post">
+    <input type="submit" value="Transactions History" onclick="toggleTransactionsData()">
   </form>
-  
+    
   <div id="transactions_data" style="display:none">
-    {% if dict %}
+
     <table border="1">
       <tr>
         <th>Transaction ID</th>
@@ -25,7 +25,6 @@
         <th>Type</th>
 
       </tr>
-      {% for row in dict %}
       <tr>
         <td>{{ dict['transactionid']}}</td>
         <td>{{ dict ['dateoftransaction'] }}</td>
@@ -35,10 +34,19 @@
         <td>{{ dict['accountid'] }}</td>
         <td>{{ dict['typ'] }}</td>
       </tr>
-      {% endfor %}
-    </table>
-    {% endif %}
-  </div>
 
+    </table>
+    
+  </div>
+    <script>
+      function toggleTransactionsData() {
+        var transactionsData = document.getElementById('transactions_data');
+        transactionsData.style.display = transactionsData.style.display === 'none' ? 'block' : 'none';
+        
+        // Prevent the default form submission behavior
+        event.preventDefault();
+      }
+    </script>
+  
   </body>
 </html>

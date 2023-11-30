@@ -151,7 +151,7 @@ def user_profile():
 
 
 # Endpoint for Savings
-@app.route('/savings', methods=['GET', 'POST'])
+@app.route('/savings.html', methods=['GET', 'POST'])
 def savings():
     uni = session.get('uni', "")
     #cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -164,10 +164,10 @@ def savings():
        accountid = i[0]
        balance = i[1]
        
-    return render_template("user_profile.html", info = {'accountid': accountid, 'balance': balance})
+    return render_template("savings.html", info = {'accountid': accountid, 'balance': balance})
 
 #Endpoint for Checkings      
-@app.route('/checkings', methods=['GET', 'POST'])
+@app.route('/checkings.html', methods=['GET', 'POST'])
 def checkings():
     uni = session.get('uni', "")
     #cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -180,10 +180,10 @@ def checkings():
        accountid = i[0]
        balance = i[1]
        
-    return render_template("user_profile.html", info = {'accountid': accountid, 'balance': balance})
+    return render_template("checkings.html", info = {'accountid': accountid, 'balance': balance})
 
 
-@app.route('/meal_plan', methods=['GET', 'POST'])
+@app.route('/meal_plan.html', methods=['GET', 'POST'])
 def mealPlan():
     uni = session.get('uni', "")
     query = text('SELECT swipes, dining_dollars, points, flex FROM dining_attachedto dat JOIN has_plan hp ON dat.accountid = hp.accountid JOIN account_belongsto ab ON hp.accountid = ab.accountid AND ab.uni = :uni')
@@ -199,7 +199,7 @@ def mealPlan():
        mealplanname = i[4]
     
   # Handle the case where dinningdata is None
-    return render_template("user_profile.html", dict = {'swipes': swipes, 'dining_dollars': dinning_dollars, 'points': points, 'flex': flex, 'mealplanname': mealplanname})
+    return render_template("meal_plan.html", dict = {'swipes': swipes, 'dinning_dollars': dinning_dollars, 'points': points, 'flex': flex, 'mealplanname': mealplanname})
 
 
 @app.route('/account_tracking.html', methods=['GET','POST'])
