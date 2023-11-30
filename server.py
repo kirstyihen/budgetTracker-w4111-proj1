@@ -186,20 +186,21 @@ def checkings():
 @app.route('/meal_plan.html', methods=['GET', 'POST'])
 def mealPlan():
     uni = session.get('uni', "")
-    query = text('SELECT swipes, dining_dollars, points, flex FROM dining_attachedto dat JOIN has_plan hp ON dat.accountid = hp.accountid JOIN account_belongsto ab ON hp.accountid = ab.accountid AND ab.uni = :uni')
+    query = text('SELECT * FROM has_plan hp JOIN dining_attachedto dat ON hp.mealplanname = dat.mealplanname JOIN account_belongsto ab ON dat.accountid = ab.accountid AND ab.uni = :uni')
     params = {'uni': uni}
     result = g.conn.execute(query, params)
     g.conn.commit()
     
     for i in result:
-       swipes = i[0]
-       dinning_dollars = i[1]
-       points = i[2]
-       flex = i[3]
+       schoolcode = i[0]
+       swipes = i[1]
+       dinning_dollars =  i[2]
+       points =  i[3]
+       flex = i[4]
        mealplanname = i[4]
     
   # Handle the case where dinningdata is None
-    return render_template("meal_plan.html", dict = {'swipes': swipes, 'dinning_dollars': dinning_dollars, 'points': points, 'flex': flex, 'mealplanname': mealplanname})
+    return render_template("meal_plan.html", dict = {'schoolcode': schoolcode,'swipes': swipes, 'dinning_dollars': dinning_dollars, 'points': points, 'flex': flex, 'mealplanname': mealplanname})
 
 
 @app.route('/account_tracking.html', methods=['GET','POST'])

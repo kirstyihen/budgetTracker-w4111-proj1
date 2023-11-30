@@ -8,21 +8,21 @@
     
   <body>
      <h1>Meal Plan Account</h1>
-        <div id="meal_plan" style="display:none">
-            <table border="1">
+        <table border="1">
+            <tr>
+                <th> SchoolCode </th>
+                <th> Swipes </th>
+                <th> Dinning Dollars </th>
+                <th> Points </th>
+                <th> Flex </th>
+            </tr>
                 <tr>
-                    <th>{{ Swipes }}</th>
-                    <th>{{ Dinning Dollars }}</th>
-                    <th>{{ Points }}</th>
-                    <th>{{Flex}}</th>
+                <td>{{dict['schoolcode']}}
+                <td>{{dict['swipes']}}</td>
+                <td>{{ dict ['dinning_dollars']}}</td>
+                <td>{{dict ['points']}}</td>
+                <td>{{dict ['flex']}}</td>
                 </tr>
-                    <tr>
-                    <th>{{dict['swipes']}}</th>
-                    <th>{{ dict ['dinning_dollars']}}</th>
-                    <th>{{dict ['points']}}</th>
-                    <th>{{dict ['flex']}}</th>
-                    </tr>
-            </table>
-        </div>
+        </table>
   </body>
 </html>
