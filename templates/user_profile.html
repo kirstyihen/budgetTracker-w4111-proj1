@@ -7,81 +7,59 @@
   </style>
 
 
-<body>
-  <h1>Hi User!</h1>
-  <nav>
-    <ul>
-        <a href="account_tracking.html"> Transaction History </a>
-    </ul>
-  </nav>
-  <form style="display: inline-block;" id="savingsForm" action="/savings" method="post">
-    <input type="submit" value="Savings Account" onclick="openSavings()">
-  </form>
+<body style="background-color:#87CEEB;">
+  <h1>Welcome {{ info['name'] }}! </h1>
+  <p>Uni: {{ info['uni'] }} </p>
+  <p>Username: {{ info['username'] }}</p>
+  <p>Password: {{ info['password'] }}</p>
+  <p>SchoolCode: {{ info['schoolcode'] }}</p>
+  <p>Schoolname: {{ info['schoolname'] }}</p>
+
+  <a href="account_tracking.html"> Transaction History </a>
   
-  <div id="savings" style="display:none">
-    
-    {% if savingsAccount_data %}
-      <table border="1">
-        <tr>
-          <th>Balance</th>
-        </tr>
-          {% for row in savingsAccount_data %}
-            <tr>
-              <td>{{ row.balance }}</td>
-            </tr>
-          {% endfor %}
-      </table>
-    {% endif %}
-  </div>
 
+<button onclick="toggleSavings()">Show Savings Account</button>
 
-  <form style="display: inline-block;" id="checkingsForm" action="/checkings" method="post">
-    <input type="submit" value="Checkings Account" onclick = "checkings()">
-  </form>
+<p id="savings" style="display:none">
+    <strong>Savings Account Balance:</strong> {{ info['balance'] }}
+</p>
 
-  <div id="checkings" style="display:none">
-  {% if checkingsAccount_data %}
-      <table border="1">
-          <tr>
-              <th>Balance</th>
-          </tr>
-          {% for row in checkingsAccount_data %}
-              <tr>
-                  <td>{{ row.balance }}</td>
-              </tr>
-          {% endfor %}
-      </table>
-  {% endif %}
-  </div>
+<script>
+    function toggleSavings() {
+        var savingsElement = document.getElementById('savings');
+        savingsElement.style.display = (savingsElement.style.display === 'none') ? 'block' : 'none';
+    }
+</script>
 
-  <form style="display: inline-block;" id="dinningForm" action="/meal_plan" method="post">
-    <input type="submit" value="Dinning Plan" onclick="document.getElementById('meal_plan').style.display='block'">
-  </form>
+<button onclick="toggleCheckings()">Show Checkings Account</button>
 
-  <div id="meal_plan" style="display:none">
-    {% if mealPlan_data %}
-      <table border="1">
-        {% for column in mealPlan_data %}
-          <tr>
-            <th>Swipes</th>
-            <th>Dinning Dollars</th>
-            <th>Points</th>
-            <th>Flex</th>
-          </tr>
-          {% for row in mealPlan_data %}
-            <tr>
-              <td>{{row.swipes}}</td>
-              <td>{{row.dining_dollars}}</td>
-              <td>{{row.points}}</td>
-              <td>{{row.flex}}</td>
-            </tr>
-          {% endfor %}
-        {%endfor%}
-      </table>
-    {% endif %}
-  </div>
+<p id="checkings" style="display:none">
+    <strong>Checkings Account Balance:</strong>{{ info['balance'] }} 
+</p>
+
+<script>
+    function toggleCheckings() {
+        var checkingsElement = document.getElementById('checkings');
+        checkingsElement.style.display = (checkingsElement.style.display === 'none') ? 'block' : 'none';
+    }
+</script>
+
+<button onclick="toggleMealPlan()">Show Meal Plan</button>
+
+<p id="meal_plan" style="display:none">
+  <strong>Swipes:</strong></br> {{ info['swipes'] }}
+  <strong>Dining Dollars:</strong></br>  {{ info['dining_dollars'] }}
+  <strong>Points:</strong></br>  {{ info['points'] }}
+  <strong>Flex:</strong></br>  {{ info['flex'] }}
+</p>
+
+<script>
+    function toggleMealPlan() {
+        var mealPlanElement = document.getElementById('meal_plan');
+        mealPlanElement.style.display = (mealPlanElement.style.display === 'none') ? 'block' : 'none';
+    }
+</script>
+
 
 </body>
-
-
 </html>
