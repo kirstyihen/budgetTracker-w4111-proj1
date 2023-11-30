@@ -126,11 +126,11 @@ def login():
 
 
 # Endpoint for User Profile
-@app.route('/user_profile.html/<name>', methods=['POST', 'GET'])
-def user_profile(name):
+@app.route('/user_profile.html', methods=['POST', 'GET'])
+def user_profile():
     # Retrieve the data from the session
     uni = session.get('uni', "")
-    #name = session.get('name', "")
+    name = session.get('name', "")
     username = session.get('username', "")
     password = session.get('password', "")
 
@@ -185,23 +185,22 @@ def checkings():
 
 @app.route('/meal_plan', methods=['GET', 'POST'])
 def mealPlan():
-    with engine.connect() as conn:
-        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute("SELECT swipes, dining_dollars, points, flex FROM dining_attachedto WHERE accountid = %s", (session['accountid'],))
-        dinningdata = cursor.fetchone()
-
-        cursor.execute("SELECT mp.* FROM meal_plan mp JOIN has_plan hp ON mp.mealplanname = hp.mealplanname")
-        mealplanname = cursor.fetchone()
-
-    # Check if dinningdata is not None before accessing its values
-    if dinningdata:
-        dict_data = {'swipes': dinningdata['swipes'], 'dining_dollars': dinningdata['dining_dollars'], 'points': dinningdata['points'], 'flex': dinningdata['flex'], 'mealplanname': mealplanname}
-
-        return render_template("user_profile.html", **dict_data)
-
-    # Handle the case where dinningdata is None
-    return render_template("user_profile.html", mealplanname=mealplanname)
+    uni = session.get('uni', "")
+    query = text('SELECT swipes, dining_dollars, points, flex FROM dining_attachedto dat JOIN has_plan hp ON dat.accountid = hp.accountid JOIN account_belongsto ab ON hp.accountid = ab.accountid AND ab.uni = :uni')
+    params = {'uni': uni}
+    result = g.conn.execute(query, params)
+    g.conn.commit()
+    
+    for i in result:
+       swipes = i[0]
+       dinning_dollars = i[1]
+       points = i[2]
+       flex = i[3]
+       mealplanname = i[4]
+    
+  # Handle the case where dinningdata is None
+    return render_template("user_profile.html", dict = {'swipes': swipes, 'dining_dollars': dinning_dollars, 'points': points, 'flex': flex, 'mealplanname': mealplanname})
 
 
 @app.route('/account_tracking.html', methods=['GET','POST'])
