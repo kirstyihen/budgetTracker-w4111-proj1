@@ -151,7 +151,7 @@ def user_profile():
 
 
 # Endpoint for Savings
-@app.route('/savings', methods=['GET'])
+@app.route('/savings', methods=['GET', 'POST'])
 def savings():
     uni = session.get('uni', "")
     #cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -185,7 +185,6 @@ def checkings():
 
 @app.route('/meal_plan', methods=['GET', 'POST'])
 def mealPlan():
-
     uni = session.get('uni', "")
     query = text('SELECT swipes, dining_dollars, points, flex FROM dining_attachedto dat JOIN has_plan hp ON dat.accountid = hp.accountid JOIN account_belongsto ab ON hp.accountid = ab.accountid AND ab.uni = :uni')
     params = {'uni': uni}

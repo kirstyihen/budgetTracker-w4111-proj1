@@ -16,10 +16,10 @@
   <p>Schoolname: {{ info['schoolname'] }}</p>
   <nav>
     <ul>
-        <a href="/account_tracking.html"> Transaction History </a>
+        <a href="account_tracking.html"> Transaction History </a>
     </ul>
   </nav>
-  <form style="display: inline-block;" action="/savings" method="post">
+  <form style="display: inline-block;" action="/savings" method="get">
     <input type="submit" value="Savings Account" onclick="document.getElementById('savings').style.display='block'">
   </form>
   
@@ -28,16 +28,18 @@
     <h2>Savings Account</h2>
       <table border="1">
         <tr>
+          <th> AccountID </th>
           <th>Balance</th>
         </tr>
             <tr>
+              <td>{{info[accountid]}}</td>
               <td>{{ info['balance'] }}</td>
             </tr>
       </table>
   </div>
 
 
-  <form style="display: inline-block;" id="checkingsForm" action="/checkings" method="post">
+  <form style="display: inline-block;" id="checkingsForm" action="/checkings" method="get">
     <input type="submit" value="Checkings Account" onclick ="document.getElementById('checkings').style.display='block'">
   </form>
 
@@ -45,25 +47,27 @@
     <h2>Checkings Account</h2>
       <table border="1">
           <tr>
+              <th>AccountID</th>
               <th>Balance</th>
           </tr>
               <tr>
+                  <td>{{ info['accountid'] }}</td>
                   <td>{{ info['balance'] }}</td>
               </tr>
       </table>
   </div>
 
-  <form style="display: inline-block;" id="dinningForm" action="/meal_plan" method="post">
+  <form style="display: inline-block;" id="dinningForm" action="/meal_plan" method="get">
     <input type="submit" value="Meal Plan" onclick="document.getElementById('meal_plan').style.display='block'">
   </form>
 
   <div id="meal_plan" style="display:none">
       <table border="1">
           <tr>
-            <th>Swipes</th>
-            <th>Dinning Dollars</th>
-            <th>Points</th>
-            <th>Flex</th>
+            <th>{{dict['swipes']}}</th>
+            <th>{{ dict ['dinning_dollars']}}</th>
+            <th>{{dict ['points']}}</th>
+            <th>{{dict ['flex']}}</th>
           </tr>
             <tr>
             </tr>
